@@ -49,12 +49,12 @@
 
       .field-heading {
         font-weight: 600;
-        font-size: 1.2rem;
+        font-size: 1rem;
       }
 
       .field-container {
         width: 50%;
-        margin: 10px 0;
+        margin: 1.2rem 0;
         padding: 0 1rem;
       }
 
@@ -108,18 +108,36 @@
       }
 
       .loader {
-        display: block;
+        display: none;
         position: absolute;
         height: 100vh;
         width: 100vw;
 
+        background: rgba(0, 0, 0, 0.542);
         z-index: 100;
+      }
+
+      .container-loader {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .loader-img {
+        width: 3rem;
+        height: 3rem;
       }
     </style>
   </head>
   <body>
     <div class="main-container">
-      <div class="loader"></div>
+      <div id="loader" class="loader">
+        <div class="container-loader">
+          <img src="./img/loader.gif" alt="loader" class="loader-img" />
+        </div>
+      </div>
       <div class="sidebar">
         <img src="./img/passImg.jpeg" alt="passImg" class="sidebar-img" />
       </div>
@@ -143,6 +161,12 @@
             <p class="field-heading">Phone Number</p>
             <input type="number" class="phoneNum input-tag" />
           </div>
+          <div class="field-container">
+            <p class="field-heading">
+              Class (Without - or _, only space allowed)
+            </p>
+            <input type="text" class="className input-tag" />
+          </div>
         </div>
         <div class="btn-container">
           <button class="submit-btn" onclick="submitButtonClick()">
@@ -156,8 +180,10 @@
     let name = document.getElementsByClassName("name")[0];
     let rollNum = document.getElementsByClassName("rollNum")[0];
     let email = document.getElementsByClassName("email")[0];
+    let className = document.getElementsByClassName("className")[0];
     let phoneNum = document.getElementsByClassName("phoneNum")[0];
     let button = document.getElementsByClassName("submit-btn");
+    let loader = document.getElementById("loader");
 
     function ValidateEmail(input) {
       var validRegex =
@@ -173,9 +199,10 @@
     function validData(data) {
       if (
         Boolean(data.name.trim().length) &&
-        Boolean(data.rollNumber.trim().length) &&
+        Boolean(data.enrollmentNo.trim().length) &&
         Boolean(data.email.trim().length) &&
-        Boolean(data.phoneNumber.trim().length)
+        Boolean(data.contactNo.trim().length) &&
+        Boolean(data.className.trim().length)
       )
         return true;
       else {
@@ -190,24 +217,32 @@
         enrollmentNo: rollNum.value,
         email: email.value,
         contactNo: phoneNum.value,
+        className: className.value,
       };
-
       if (validData(data) && ValidateEmail(data.email)) {
         try {
-          button[0].style.disabled = true;
+          loader.style.display = "block";
           await fetch("https://passbackend.herokuapp.com/BookPass", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: data,
+            body: JSON.stringify(data),
           })
             .then((response) => response.json())
             .then((data) => {
               console.log("Success:", data);
+              name.value =
+                rollNum.value =
+                email.value =
+                phoneNum.value =
+                className.value =
+                  "";
+              loader.style.display = "none";
             })
             .catch((error) => {
               console.error("Error:", error);
+              loader.style.display = "none";
             });
         } catch (error) {
           alert("Something Went Wrong!!");
