@@ -13,6 +13,7 @@
         font-family: "Roboto", sans-serif;
       }
       .main-container {
+        position: relative;
         width: 100%;
         height: 100vh;
         display: flex;
@@ -105,10 +106,20 @@
       input[type="number"] {
         -moz-appearance: textfield;
       }
+
+      .loader {
+        display: block;
+        position: absolute;
+        height: 100vh;
+        width: 100vw;
+
+        z-index: 100;
+      }
     </style>
   </head>
   <body>
     <div class="main-container">
+      <div class="loader"></div>
       <div class="sidebar">
         <img src="./img/passImg.jpeg" alt="passImg" class="sidebar-img" />
       </div>
@@ -176,20 +187,20 @@
     async function submitButtonClick() {
       let data = {
         name: name.value,
-        rollNumber: rollNum.value,
+        enrollmentNo: rollNum.value,
         email: email.value,
-        phoneNumber: phoneNum.value,
+        contactNo: phoneNum.value,
       };
-      if (validData(data) && ValidateEmail(data.email)) {
-        button[0].style.disabled = true;
 
+      if (validData(data) && ValidateEmail(data.email)) {
         try {
-          await fetch("https://example.com/profile", {
+          button[0].style.disabled = true;
+          await fetch("https://passbackend.herokuapp.com/BookPass", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(data),
+            body: data,
           })
             .then((response) => response.json())
             .then((data) => {
@@ -203,7 +214,6 @@
         }
 
         button[0].style.disabled = false;
-        console.log(name.value, rollNum.value, email.value, phoneNum.value);
       }
     }
   </script>
